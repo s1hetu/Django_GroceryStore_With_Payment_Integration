@@ -1,0 +1,12 @@
+img {
+    float: left;
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+}
+
+
+.navbar-nav > li > .dropdown-menu { background-color: #FFFFFF; }
+
+
+
