@@ -2,32 +2,16 @@
 
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" type="text/css" href="{% static 'store/css/register.css' %}">
-{#    <form method="POST" enctype="multipart/form-data">#}
-{#        {% csrf_token %}#}
-{#        <br>#}
-        {#    {% for i in form %}#}
-        {#        {{ i.label }}#}
-        {#        {{ i }}#}
-        {#        <br>#}
-        {#        <br>#}
-        {##}
-        {##}
-        {#    {% endfor %}#}
-{#        {{ form.as_p }}#}
-{#        <button type="submit">Submit</button>#}
-{#    </form>#}
-{#{% endblock %}#}
+    <link rel="stylesheet" type="text/css" href="{% static 'product/css/add_product.css' %}">
 
 <div class="content-section">
 {% include 'product/messages.html' %}
+    <h2>Add Product</h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">
-                <div>
                     {% for field in form %}
-                        <p>{{ field.errors }}</p>
                         {{ field.label }}
                         {% if field.errors %}
                             {{ field }}
@@ -40,7 +24,6 @@
                             {{ field }}
                         {% endif %}
                     {% endfor %}
-                </div>
             </legend>
         </fieldset>
     <button type="submit">Submit</button>

@@ -1,0 +1,27 @@
+{% extends "store/../../../product/templates/product/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Feedback {% endblock %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'store/css/feedback.css' %}">
+{% endblock %}
+{% block content %}
+{#    {% include "store/messages.html" %}#}
+
+    <div class="container">
+  <form action="/">
+
+    <label for="fname">First Name</label>
+    <input type="text" id="fname" name="fname" placeholder="Your name..">
+
+    <label for="lname">Last Name</label>
+    <input type="text" id="lname" name="lname" placeholder="Your last name..">
+
+    <label for="subject">Feedback</label>
+    <textarea id="subject" name="subject" placeholder="Write something.." style="height:100px"></textarea>
+
+    <input type="submit" value="Submit">
+
+  </form>
+</div>
+{% endblock %}

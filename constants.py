@@ -30,7 +30,7 @@ PROFILE_TEMPLATE = "store/profile.html"
 ABOUT_TEMPLATE = "store/about.html"
 FEEDBACK_TEMPLATE = "store/feedback.html"
 REGISTER_BRAND_TEMPLATE = "store/register_brand.html"
-REGISTER_USER_TEMPLATE = 'store/register.html'
+REGISTER_USER_TEMPLATE = "store/register.html"
 
 
 

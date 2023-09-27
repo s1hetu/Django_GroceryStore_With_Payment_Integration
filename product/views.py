@@ -33,7 +33,6 @@ import logging
 
 logger = logging.getLogger('django')
 custom_logger = logging.getLogger('custom_logger')
-warn_and_above_logger = logging.getLogger('warn_and_above_logger')
 
 
 class FailureView(LoginRequiredMixin, UserIsCustomerMixin, TemplateView):
@@ -60,9 +59,6 @@ class ReturnProductView(LoginRequiredMixin, UserIsCustomerMixin, TemplateView):
 class UpdateOrderStatus(LoginRequiredMixin, UserIsSellerMixin, UpdateView):
     """For updating the status of the products"""
     model = Invoice
-    # invoice = Invoice.objects.get()
-    # print(invoice.status)
-    # if Invoice.status == 'Delivered':
     fields = ['status']
     template_name = UPDATE_ORDER_STATUS_TEMPLATE
     success_url = reverse_lazy('view-order')
@@ -85,23 +81,17 @@ class ViewOrdersVendor(LoginRequiredMixin, UserIsSellerMixin, View):
 
     def get(self, request):
         brand_user = Brand.objects.get(user=request.user)
-        # print(brand_user)
         invoice = Invoice.objects.filter(product__brand=brand_user)
         return render(request, VIEW_ORDER_VENDOR_TEMPLATE, {'invoice': invoice})
 
 
-# cant test for this
 class DownloadInvoice(LoginRequiredMixin, UserIsCustomerMixin, View):
     """For downloading invoice"""
 
     def get(self, request, pk):
         order = Order.objects.get(pk=pk)
-        invoice = Invoice.objects.filter(order=order)
-        context = {
-
-            'all_orders': Invoice.objects.filter(order=pk), 'order': order, 'order_ids': order.id}
-        pdf = RenderToPdf(INVOICE_TEMPLATE, context)
-        if pdf:
+        context = {'all_orders': Invoice.objects.filter(order=order), 'order': order, 'order_ids': order.id}
+        if pdf := RenderToPdf(INVOICE_TEMPLATE, context):
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "Invoice_%s.pdf" % context['order_ids']
 
@@ -163,11 +153,11 @@ class PaymentSuccessView(LoginRequiredMixin, UserIsCustomerMixin, View):
         product = Product.objects.get(pk=prod_pk)
         address = request.GET.get('address')
         quantity = int(request.GET.get('quantity'))
-
-        order = get_object_or_404(Order, stripe_payment_intent=session.payment_intent)
+        order = get_object_or_404(Order, session_id=session_id)
         order.total_amount = float(product.calculate_discount) * int(quantity)
         order.address = address
         order.has_paid = True
+        order.stripe_payment_intent = session.payment_intent
         order.save()
 
         invoice = Invoice()
@@ -203,17 +193,15 @@ class CreateCheckoutSession(LoginRequiredMixin, UserIsCustomerMixin, View):
             items_left = available_items - float(quantity)
             number_purchased += float(quantity)
             stripe.api_key = settings.STRIPE_SECRET_KEY
-            session = stripe.checkout.Session.create(payment_method_types=['card'], line_items=[{
+            session = stripe.checkout.Session.create(line_items=[{
                 'price_data': {'currency': 'inr', 'unit_amount': int(float(product.calculate_discount) * 100),
-                               'product_data': {'name': product.name}, }, 'quantity': quantity}], mode='payment',
-                                                     success_url=request.build_absolute_uri(reverse(
-                                                         'success')) + "?session_id={CHECKOUT_SESSION_ID}&address=" + address + "&quantity=" + str(
-                                                         quantity) + "&product=" + str(pk),
-                                                     cancel_url=request.build_absolute_uri(reverse('failure')),
+                    'product_data': {'name': product.name}, }, 'quantity': quantity}], mode='payment',
+                success_url=request.build_absolute_uri(
+                    reverse('success')) + "?session_id={CHECKOUT_SESSION_ID}&address=" + address + "&quantity=" + str(
+                    quantity) + "&product=" + str(pk), cancel_url=request.build_absolute_uri(reverse('failure')),
 
-                                                     )
-
-            Order.objects.create(customer=customer, stripe_payment_intent=session['payment_intent'], total_amount=0)
+            )
+            Order.objects.create(customer=customer, session_id=session.id, total_amount=0)
             return JsonResponse({'sessionId': session.id})
         else:
             messages.error(request, f"{product.name} not available in that quantity")
@@ -246,7 +234,7 @@ class PaymentSuccessViewCart(LoginRequiredMixin, UserIsCustomerMixin, View):
 
         customer = Customer.objects.get(user=request.user)
         total_amount = 0
-        order = get_object_or_404(Order, stripe_payment_intent=session.payment_intent)
+        order = get_object_or_404(Order, session_id=session_id)
 
         invoices = []
         cart_products = Cart.objects.filter(customer=customer)
@@ -261,6 +249,7 @@ class PaymentSuccessViewCart(LoginRequiredMixin, UserIsCustomerMixin, View):
         order.has_paid = True
         order.address = request.GET.get('address')
         order.total_amount = total_amount
+        order.stripe_payment_intent = session.payment_intent
         order.save()
         Cart.objects.filter(customer=customer).delete()
 
@@ -470,13 +459,13 @@ class AddToWishList(LoginRequiredMixin, UserIsCustomerMixin, View):
             """If item already exist in wishlist"""
             WishList.objects.get(customer=customer, product=product)
             messages.warning(request, 'Item Already exist')
-            warn_and_above_logger.warning(f'{product} already exists in {customer} wishlist')
+            # inf.warning(f'{product} already exists in {customer} wishlist')
             return redirect('wishlist')
         except ObjectDoesNotExist:
             """Add item to wishlist if not already exists"""
             WishList.objects.create(customer=customer, product=product)
             messages.success(request, "Item added to WishList.")
-            warn_and_above_logger.info(f"{product} added succesfully to {customer} wishlist")
+            # warn_and_above_logger.info(f"{product} added succesfully to {customer} wishlist")
             return redirect('wishlist')
 
 
@@ -488,7 +477,6 @@ class WishListView(LoginRequiredMixin, UserIsCustomerMixin, ListView):
     def get_queryset(self):
         """Get products based on Customer"""
         products = WishList.objects.filter(customer=Customer.objects.get(user=self.request.user))
-        warn_and_above_logger.debug('view favourites')
         return products
 
 
@@ -620,60 +608,3 @@ class SearchProduct(View):
 class DetailProductView(DetailView):
     """Showing the details of each product"""
     model = Product
-
-# class AddAddressOnlyView(View):
-#     def post(self, request):
-#         customer = Customer.objects.get(user=self.request.user)
-#         cart_products = Cart.objects.filter(customer=customer)
-#         address = self.request.POST.get('address-buy')
-#         total_amount = 0
-#         invoices = []
-#
-#         '''for checking the quantity'''
-#         for i in cart_products:
-#             if i.product.available_quantity >= i.quantity:
-#                 product = i
-#                 i.product.available_quantity -= i.quantity
-#                 i.product.save()
-#                 total_amount += float(product.product.calculate_discount) * product.quantity
-#                 invoices.append(Invoice(product=product.product, quantity=product.quantity))
-#             else:
-#                 break
-#         else:
-#             order = Order.objects.create(customer=customer, address=address, total_amount=0)
-#             for i in invoices:
-#                 i.order = order
-#                 i.save()
-#             Order.objects.filter(customer=customer, address=address, total_amount=0).update(total_amount=total_amount)
-#             Cart.objects.filter(customer=customer).delete()
-#             messages.success(request, "Order successful")
-#             return redirect('orders')
-#         return redirect('grocery_store_home')
-#
-#
-# '''For getting the address, quantity for the single item order'''
-#
-#
-# class AddAddressView(View):
-#     def post(self, request, pk):
-#         customer = Customer.objects.get(user=self.request.user)
-#         product = Product.objects.get(pk=pk)
-#         address = self.request.POST.get('address-buy')
-#         quantity = self.request.POST.get('quantityy')
-#         available_items = Product.objects.get(pk=pk).available_quantity
-#
-#         '''for checking the quantity'''
-#         if available_items >= float(quantity):
-#             items_left = available_items - float(quantity)
-#             order = Order.objects.create(customer=customer, address=address,
-#                                          total_amount=Product.objects.get(pk=pk).calculate_discount)
-#             Invoice.objects.create(order=order, product=product, quantity=quantity)
-#             number_purchased = Product.objects.get(pk=pk).no_of_purchases
-#             number_purchased += float(quantity)
-#             Product.objects.filter(pk=pk).update(no_of_purchases=number_purchased)
-#             Product.objects.filter(pk=pk).update(available_quantity=items_left)
-#             messages.success(request, "Order successful")
-#             return redirect('orders')
-#         else:
-#             messages.success(request, "Item not available in that quantity")
-#             return redirect('grocery_store_home')

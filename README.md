@@ -1,4 +1,4 @@
-# Grocery
+# Grocery Store
 
 # Requirements
 ```python
@@ -32,6 +32,9 @@ python manage.py runserver
 - View/Add/Remove Favourite Brands
 - Add Review to Product
 - Buy Products
+- View Orders
+- Download Order Invoice
+- Return Product Once Delivered
 - View About Section
 - Provide Feedback
 - Logout
@@ -44,4 +47,5 @@ python manage.py runserver
 - Add/Update own Product
 - View own Orders
 - View own Products
+- Update Order Status (e.g. Packed, Shipped, etc.)
 - Logout

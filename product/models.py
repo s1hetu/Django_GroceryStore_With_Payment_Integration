@@ -115,6 +115,7 @@ class Order(models.Model):
     # status = models.CharField(max_length=30, choices=status_choices, default="Initialized")
     stripe_payment_intent = models.CharField(max_length=200, null=True)
     has_paid = models.BooleanField(default=False)
+    session_id = models.CharField(max_length=200, unique=True)
 
     @staticmethod
     def get_orders_by_user(user):

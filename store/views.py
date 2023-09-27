@@ -24,13 +24,6 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.base import View
 
 
-# class DeleteProfileView(View):
-#     def get(self, request):
-#         User.objects.get(username=request.user).delete()
-#         messages.success(request, "User deleted successfully")
-#         return render(request, 'store/delete_profile.html', {})
-
-
 class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     template_name = CHANGE_PASSWORD_TEMPLATE
     success_message = PASSWORD_CHANGED_SUCCESSFULLY_MESSAGE
@@ -60,15 +53,6 @@ def profile(request):
     return render(request, PROFILE_TEMPLATE, context)
 
 
-# class UserProfileView(DetailView):
-#     # fields - ['username', 'age', 'gender', 'mobile_no', 'email']
-#     template_name = 'store/profile.html'
-#
-#     def get_object(self):
-#         print(self.request.user)
-#         return self.request.user
-
-
 class AboutView(TemplateView):
     template_name = ABOUT_TEMPLATE
 
@@ -88,13 +72,6 @@ def registerbrand(request):
 
         if b_form.is_valid() and u_form.is_valid():
 
-            # b_user = b_form.save(commit=False)
-            # u_user = u_form.save(commit=False)
-            #
-            # b_user.brand = b_user.brand.lower()
-            # b_user.user = u_user
-            # b_user.email = u_user.email
-
             u_user = u_form.save(commit=False)
             u_user.is_staff = True
             u_user.is_active = False
@@ -104,22 +81,12 @@ def registerbrand(request):
             b_user.brand = b_user.brand.lower()
             b_user.save()
 
-            # u_user.save()
-            # b_user.save()
-
-            # not needed if using custom admin pannel
-            # brand_admin_privileges = Group.objects.get(name='Brand_admin')
-            # brand_admin_privileges.user_set.add(u_user)
-
             messages.success(request, BRAND_SUCCESSFULLY_CREATED_MESSAGE)
             return redirect('login')
 
         else:
-            # messages.error(request, "Registration failed.")
-            # return redirect('register-brand')
             return render(request, REGISTER_BRAND_TEMPLATE, {'c_form': b_form, 'u_form': u_form})
     else:
-        # messages.error(request, "Invalid Request.")
         return render(request, REGISTER_BRAND_TEMPLATE, {'c_form': b_form, 'u_form': u_form})
 
 
@@ -134,17 +101,10 @@ def register(request):
 
         if c_form.is_valid() and u_form.is_valid():
 
-            # c_user = c_form.save(commit=False)
             u_user = u_form.save()
             c_user = c_form.save(commit=False)
             c_user.user = u_user
             c_form.save()
-            # c_user = c_form.save(commit=False)
-            # c_user.user = u_user
-            # c_user.email = u_user.email
-            # c_user.username = u_user.username
-            # u_user.save()
-            # c_user.save()
 
             messages.success(request, ACCOUNT_CREATED_SUCCESSFULLY_MESSAGE)
             return redirect('login')
@@ -155,10 +115,3 @@ def register(request):
 
     else:
         return render(request, REGISTER_USER_TEMPLATE, {'c_form': c_form, 'u_form': u_form})
-
-# Permissions
-# view, add, change, delete product
-# view, change, delete brand
-from django.shortcuts import render
-
-# Create your views here.
