@@ -1,0 +1,75 @@
+{% extends "store/../../../product/templates/product/base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Register {% endblock %}
+
+{% block css %}
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'store/css/register.css' %}">
+{% endblock %}
+
+# check if email exists
+{#from validate_email_address import validate_email#}
+{#isExists = validate_email('haxratali0@gmail.com', verify=True)#}
+{#print(isExists)#}
+
+{% block content %}
+    <div class="content-section">
+        <h2>Registration</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <br>
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">
+                    <div>
+
+                        {% for field in u_form %}
+                            <p>{{ field.errors }}</p>
+                            {{ field.label }}
+                            {% if field.errors %}
+                                {{ field }}
+                                <div class="invalid-feedback">
+                                    {% for error in field.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for field in c_form %}
+                            {{ field.label }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small><br><br>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+
+                        <button type="submit">Sign up</button>
+                        <br>
+                    <br>
+                    <br>
+                        <p style="text-align: center">or</p>
+
+                        <button href="{% url 'login' %}">Login</button>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="link">
+                        <a class="center" href={% url 'register-brand' %}>Register as Brand</a>
+                    </div>
+                </legend>
+            </fieldset>
+
+
+        </form>
+    </div>
+{% endblock %}
