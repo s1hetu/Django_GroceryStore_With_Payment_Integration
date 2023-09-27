@@ -1,0 +1,53 @@
+
+<html>
+{% load static %}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'product/css/cart.css' %}">
+</head>
+<div class="container-fluid row">
+    <div class="col-lg-12">
+        <div class="row">
+            <p style="text-align: left">{{ order.id }}</p>
+            <p style="text-align: right">{{ order.datetime }}</p>
+        </div>
+        <span>Name : {{ order.customer.user.username }}</span>
+        <br>
+        <span>Name : {{ order.customer.mobile_no }}</span>
+        <br>
+        <span>Address : {{ order.address }}</span>
+
+        <br>
+        <br>
+        <br>
+        <br>
+        {% for item in all_orders %}
+            <div class="box-element">
+            <div class="cart-row">
+                {#                    <div style="flex: 1;"><strong>Order</strong></div>#}
+                {#                    <div style="flex: 2;"><strong>Image</strong></div>#}
+                <div style="flex: 2;"><strong>Item : {{ item.product.name }}</strong></div>
+                <div style="flex: 1;"><strong>Unit Price : {{ item.product.calculate_discount }}</strong></div>
+                <div style="flex: 1;"><strong>Quantity : {{ item.quantity }}</strong></div>
+                <div style="flex: 1;"><strong>Category : {{ item.product.category }}</strong></div>
+                <div style="flex: 1;"><strong>Brand : {{ item.product.brand }}</strong></div>
+                {#                    <div style="flex: 1;"><strong>Address : {{ item.order.address }}</strong></div>#}
+                {#                    <div style="flex: 1;"><strong>DateTime : {{ item.order.datetime }}</strong></div>#}
+                {#                    <div style="flex: 1;"><strong>Payment Method : {{ item.order.payment_method }}</strong></div>#}
+                <div style="flex: 1;"><strong>Amount : {{ item.total_price }}</strong></div>
+                <br><br><br>
+            </div>
+
+        {% endfor %}
+        <div class="row">
+            <span>Payment Method : {{ order.payment_method }}</span>
+            <br>
+            <span>Total Amount : {{ order.total_amount }}</span>
+        </div>
+
+
+
+        </div>
+    </div>
+</div>
+</html>

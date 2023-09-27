@@ -1,0 +1,24 @@
+{% extends 'product/admin_func.html' %}
+
+{% load static %}
+{% block content %}
+{% include 'product/messages.html' %}
+<form method="POST">
+    {% csrf_token %}
+    <br>
+    <br>
+    <br>
+    {{ form.as_p }}
+
+
+    <p>Existing Categories</p>
+    {% for i in category %}
+        <ul>
+            <li>{{ i.name }}</li>
+        </ul>
+
+
+    {% endfor %}
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

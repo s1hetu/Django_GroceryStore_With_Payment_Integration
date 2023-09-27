@@ -1,0 +1,271 @@
+{#{% extends "product/base.html" %}#}
+
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.rtl.min.css"
+          integrity="sha384-dc2NSrAXbAkjrdm9IYrX10fQq9SDG6Vjz7nQVKdKcJl3pC+k37e7qJR5MVSCS+wR" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'product/css/home.css' %}">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+</head>
+<body>
+{% include 'product/messages.html' %}
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'grocery_store_home' %}">Grocery Store</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'grocery_store_home' %}">Home</a>
+                </li>
+                <form method="POST" action="{% url 'product-search' %}">
+                    {% csrf_token %}
+                    <span class="d-flex justify-content-center" role="search">
+                        <input class="form-control " name="searched" id="search_input" type="search"
+                               placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit" id="submit" disabled>Search</button>
+
+                      </span>
+                </form>
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false" type='button'>
+                        Filters
+                    </button>
+                    <ul class="dropdown-menu p-8" aria-labelledby="dropdownMenuButton1">
+                        <li>Categories</li>
+                        <ul class="px-6 py-6">
+                            {% for i in category %}
+                                <li><a href="{% url 'view-category' i %}">{{ i }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        <form action="{% url 'price-filter' %}">
+                            <div class="dropdown-divider"></div>
+                            <li>Prices</li>
+                            <label for="min_val">Min Value</label>
+                            <input type="number" class="form-control" name="min_val" id="min_val" min="0"
+                                   placeholder="Minimum Value">
+                            <label for="min_val">Max Value</label>
+                            <input type="number" class="form-control" name="max_val" id="max_val" min="0"
+                                   placeholder="Maximum Value">
+
+                            <button class="btn-success" type="submit">Apply</button>
+                        </form>
+                    </ul>
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'about-us' %}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'give-feedback' %}">Feedback</a>
+                </li>
+                <div class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Orders
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" href="{% url 'cart' %}">My Cart</a></li>
+                                <li><a class="dropdown-item" href="{% url 'favourites' %}">View Favourites</a></li>
+                                <li><a class="dropdown-item" href="{% url 'wishlist' %}">My WishList</a></li>
+                                <li><a class="dropdown-item" href="{% url 'orders' %}">My Orders</a></li>
+                            </ul>
+                        </div>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user-profile' %}">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout-user' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register-user' %}">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </div>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- trending products -->
+{#<p>Based on reviews</p>#}
+{#{% for k in reviews %}#}
+{#    {{ k }}#}
+{#    {{ k.discount }}#}
+{#{% endfor %}#}
+{#<br>#}
+{#<br>#}
+{#<p>Based on wishlist</p>#}
+{#{% for k in wishlist %}#}
+{#        {{ k }}#}
+{#        {{ k.discount }}#}
+{##}
+{#{% endfor %}#}
+{#<br>#}
+{#<br>#}
+{#<p>Based on no_of_purchases</p>#}
+{#{% for k in trendings %}#}
+{#    {{ k.name }}#}
+{#    {{ k.discount }}#}
+{#{% endfor %}#}
+{#{% for i in all_products %}#}
+{#    {{ i }}#}
+{#{% endfor %}#}
+
+<section style="background-color: #eee;">
+    <div class="container py-2">
+        <h3>Trending Products</h3>
+        <p>Based on Number of purchases, wishlist, reviews</p>
+        <div class="row">
+            {% for product in all_products %}
+                {% if product.available_quantity != 0 %}
+                    <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
+                    <div class="card mb-4">
+                        <div class="d-flex justify-content-between p-3">
+                        </div>
+                        <img src="{{ product.image.url }}"
+                             class="card-img-top" alt="{{ product.name }}"/>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <p class="small">{{ product.brand }}</p>
+                                <p class="small text-danger">
+                                    {% if product.price == product.calculate_discount %}
+                                        <i>₹{{ product.price }}</i>
+                                    {% else %}
+                                        <s>₹{{ product.price }}</s>
+                                        <i><b>({{ product.discount }}% Off)</b></i>
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <h4><a href="{% url 'product-detail' product.id %}"
+                                       class="mb-0">{{ product.name }}</a></h4>
+                                <h5 class="text-dark mb-0">₹{{ product.calculate_discount }}</h5>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <p class="text-muted mb-0">Available:
+                                    <span class="fw-bold">{{ product.available_quantity }}</span>
+                                </p>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <h6 class="text mb-0">{{ product.volume }} {{ product.volume_unit }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<!-- all products -->
+<section style="background-color: #eee;">
+    <div class="container py-2">
+        <h3>All Products</h3>
+        <div class="row">
+            {% for product in products %}
+                {% if product.available_quantity != 0 %}
+                <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
+                    <div class="card mb-4">
+                        <div class="d-flex justify-content-between p-3">
+                        </div>
+                        <img src="{{ product.image.url }}"
+                             class="card-img-top" alt="{{ product.name }}"/>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <p class="small">{{ product.brand }}</p>
+                                <p class="small text-danger">
+                                    {% if product.price == product.calculate_discount %}
+                                        <i>₹{{ product.price }}</i>
+                                    {% else %}
+                                        <s>₹{{ product.price }}</s>
+                                        <i><b>({{ product.discount }}% Off)</b></i>
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <h4><a href="{% url 'product-detail' product.id %}"
+                                       class="mb-0">{{ product.name }}</a></h4>
+                                <h5 class="text-dark mb-0">₹{{ product.calculate_discount }}</h5>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <p class="text-muted mb-0">Available:
+                                    <span class="fw-bold">{{ product.available_quantity }}</span>
+                                </p>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <h6 class="text mb-0">{{ product.volume }} {{ product.volume_unit }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+</div>
+<!--
+jQuery
+when document is ready (DOM loaded)
+id : search_input
+when key press is over i.e. on 'keyup' event
+if that attributes length is 0,
+set disable attribute of id : submit to true
+else
+remove disable attribute
+-->
+
+<script>
+    $(document).ready(function () {
+        $('#search_input').on('keyup', function () {
+            if ($(this).val().length == 0) {
+                $("#submit").attr("disabled", true);
+            } else {
+                $("#submit").removeAttr("disabled");
+            }
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+</body>
+</html>
+{#    {% for message in messages %}#}
+{#        <div class="alert alert-success">#}
+{#            <a class="close" href="#" data-dismiss="alert"></a>#}
+{#            {{ message }}#}
+{#        </div>#}
+{#    {% endfor %}#}
+

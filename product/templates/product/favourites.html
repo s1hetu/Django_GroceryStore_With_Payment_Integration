@@ -1,0 +1,93 @@
+{% extends "product/base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Home {% endblock %}
+
+{% block css %}
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">#}
+    {#    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">#}
+    {#         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"#}
+    {#            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">#}
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">#}
+    <link rel="stylesheet" type="text/css" href="{% static 'product/css/home.css' %}">
+{% endblock %}
+
+
+
+
+{% block content %}
+
+    {% include 'product/messages.html' %}
+
+    <br>
+    <br>
+    All Brands :
+    {% for all in all_brands %}
+        <a class="btn btn-outline-info" href="{% url 'add-to-favourites' all.id %}">{{ all.brand }}</a>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    {% if fav %}
+        Your Favourites :
+        {% for all in fav %}
+
+            <a class="btn btn-outline-success"
+               href="{% url 'remove-from-favourites' all.brand.id %}">{{ all.brand }}</a>
+        {% endfor %}
+    {% else %}
+        <p>No Favourite Brands yet, Click on Brand you want to add to your Favourites and View their products</p>
+    {% endif %}
+
+    <section style="background-color: #eee;">
+        <div class="container py-5">
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
+                        <div class="card mb-4">
+                            <div class="d-flex justify-content-between p-3">
+                            </div>
+                            <img src="{{ product.image.url }}"
+                                 class="card-img-top" alt="Laptop"/>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <p class="small"><a href="{% url 'add-to-favourites' product.brand.id %}"
+                                                        class="text-muted">{{ product.brand }}</a></p>
+
+                                    <p class="small text-danger">
+                                        {% if product.price == product.calculate_discount %}
+                                            <i>₹{{ product.price }}</i>
+                                        {% else %}
+                                            <s>₹{{ product.price }}</s>
+                                            <i><b>({{ product.discount }}% Off)</b></i>
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-3">
+                                    <h4><a href="{% url 'product-detail' product.id %}"
+                                           class="mb-0">{{ product.name }}</a></h4>
+                                    <h5 class="text-dark mb-0">₹{{ product.calculate_discount }}</h5>
+
+
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+
+                                    <p class="text-muted mb-0">Available:
+                                        <span class="fw-bold">{{ product.available_quantity }}</span>
+                                    </p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    </div>
+{% endblock %}

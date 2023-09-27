@@ -1,0 +1,14 @@
+{% extends 'product/admin_func.html' %}
+
+{% load static %}
+{% block content %}
+{% include 'product/messages.html' %}
+<form method="POST">
+    {% csrf_token %}
+    <br>
+    <br>
+    <br>
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

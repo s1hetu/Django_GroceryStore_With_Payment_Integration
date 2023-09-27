@@ -1,0 +1,86 @@
+{% extends "product/base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Home {% endblock %}
+
+{% block css %}
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">#}
+    {#    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">#}
+    {#         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"#}
+    {#            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">#}
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">#}
+    <link rel="stylesheet" type="text/css" href="{% static 'product/css/cart.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% include 'product/messages.html' %}
+    {% if items %}
+        <div class="container-fluid row">
+            <div class="col-lg-12">
+                <div class="box-element">
+                    <a href="/" class="btn btn-outline-dark">&#x2190 Continue Shopping</a>
+                    <br><br>
+                </div>
+                <br>
+                <div class="box-element">
+                    <div class="cart-row">
+                        <div style="flex: 1;"><strong>Order</strong></div>
+                        {#                    <div style="flex: 2;"><strong>Image</strong></div>#}
+                        {#                    <div style="flex: 2;"><strong>Item</strong></div>#}
+                        {#                    <div style="flex: 1;"><strong>Unit Price</strong></div>#}
+                        {#                    <div style="flex: 1;"><strong>Quantity</strong></div>#}
+                        <div style="flex: 1;"><strong>Address</strong></div>
+                        <div style="flex: 1;"><strong>DateTime</strong></div>
+                        <div style="flex: 1;"><strong>Payment Method</strong></div>
+                        <div style="flex: 1;"><strong>Total Amount</strong></div>
+                        <div style="flex: 1;"><strong>Download</strong></div>
+                    </div>
+
+                    {% for item in items %}
+                        <div class="cart-row">
+                            <div style="flex: 1;"><a href="{% url 'detail-orders' item.id %}">{{ item.id }}</a></div>
+                            {#                        <div style="flex: 2;"><img class="row-image" src="{{ item.product.image.url }}" alt=""></div>#}
+                            {#                        <div style="flex: 2;">{{ item.product.name }}</div>#}
+                            {#                        <div style="flex: 1;">(₹{{ item.product.calculate_discount }})</div>#}
+                            {#                        <div style="flex:1" ;>{{ item.quantity }}</div>#}
+                            <div style="flex: 1;">{{ item.address }}</div>
+                            <div style="flex: 1;">{{ item.datetime }}</div>
+                            <div style="flex: 1;">{{ item.payment_method }}</div>
+                            <div style="flex: 1;">{{ item.total_amount }}</div>
+                            <div style="flex: 1;"><a href="{% url 'download-invoice' item.id %}">Download Invoice</a>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="container-fluid row">
+            <div class="col-lg-12">
+                <div class="box-element">
+                    <a href="/" class="btn btn-outline-dark">&#x2190 Start Shopping</a>
+                    <br><br>
+                </div>
+            </div>
+            <p>You have no Purchase History</p>
+        </div>
+    {% endif %}
+
+    {#    <script>#}
+    {#        var i = 0#}
+    {#        var total_amount = 0#}
+    {#        while (true) {#}
+    {#            i += 1#}
+    {#            var price = 'quan_price' + i#}
+    {#            if (document.getElementById(price)) {#}
+    {#                total_amount += parseFloat((document.getElementById(price).innerHTML))#}
+    {#            } else {#}
+    {#                break#}
+    {#            }#}
+    {#        }#}
+    {#        document.getElementById('final_price').innerText = 'Total ₹ ' + total_amount.toFixed(2)#}
+    {#    </script>#}
+{% endblock %}

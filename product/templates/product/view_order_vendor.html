@@ -1,0 +1,61 @@
+{% extends 'product/admin_func.html' %}
+
+{% load static %}
+{% block content %}
+{% if invoice %}
+    {% include 'product/messages.html' %}
+     <link rel="stylesheet" type="text/css" href="{% static 'product/css/cart.css' %}">
+    <div class="container-fluid row">
+        <div class="col-lg-12">
+            <br>
+            <div class="box-element">
+                <div class="cart-row">
+                    <div style="flex: 1;"><strong>Invoice Id</strong></div>
+                    <div style="flex: 1;"><strong>Order Id</strong></div>
+                    <div style="flex: 1;"><strong>Customer</strong></div>
+                    <div style="flex: 1;"><strong>Address</strong></div>
+                    <div style="flex: 2;"><strong>DateTime</strong></div>
+                    <div style="flex: 1;"><strong>Payment Method</strong></div>
+                    <div style="flex: 1;"><strong>Total Amount</strong></div>
+                    <div style="flex: 1;"><strong>Quantity</strong></div>
+                    <div style="flex: 1;"><strong>Product</strong></div>
+                    <div style="flex: 1;"><strong>Unit Price</strong></div>
+{#                    <div style="flex: 1;"><strong>Brand</strong></div>#}
+{#                    <div style="flex: 1;"><strong>Packed</strong></div>#}
+{#                    <div style="flex: 1;"><strong>Shipped</strong></div>#}
+                    <div style="flex: 1;"><strong>Product Status</strong></div>
+{#                    <div style="flex: 1;"><strong>Order Status</strong></div>#}
+                </div>
+
+                {% for item in invoice %}
+                    <div class="cart-row">
+                        <div style="flex: 1;"><a href="{% url 'update-product-status' item.id %}">{{ item.id }}</a></div>
+{#                        <div style="flex: 1;"><a href="{% url 'update-order-status' item.order.id %}">{{ item.order.id }}</a></div>#}
+                        <div style="flex: 1;">{{ item.order.id }}</div>
+                        <div style="flex: 1;">{{ item.order.customer }}</div>
+                        <div style="flex: 1;">{{ item.order.address }}</div>
+                        <div style="flex: 2;">{{ item.order.datetime }}</div>
+                        <div style="flex: 1;">{{ item.order.payment_method }}</div>
+                        <div style="flex: 1;">{{ item.total_price }}</div>
+                        <div style="flex: 1;">{{ item.quantity}}</div>
+                        <div style="flex: 1;">{{ item.product }}</div>
+{#                        <div style="flex: 1;">{{ item.product.brand }}</div>#}
+{#                        <div style="flex: 1;">{{ item.packed }}</div>#}
+{#                        <div style="flex: 1;">{{ item.shipped }}</div>#}
+                        <div style="flex: 1;">{{ item.product.calculate_discount }}</div>
+                        <div style="flex: 1;">{{ item.status }}</div>
+{#                        <div style="flex: 1;">{{ item.order.status }}</div>#}
+                        </div>
+
+
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="container-fluid row">
+        <p>No orders yet</p>
+    </div>
+{% endif %}
+{% endblock %}

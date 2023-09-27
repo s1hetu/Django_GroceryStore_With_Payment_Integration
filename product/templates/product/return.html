@@ -1,0 +1,11 @@
+{% extends 'product/base.html' %}
+{% include 'product/messages.html' %}
+{% load static %}
+{% block content %}
+    <form action = "{% url 'return-status' pk %}" method="POST">
+    {% csrf_token %}
+        <label for="return">Reason</label>
+        <textarea name="return" id="'return"></textarea>
+    <button type="submit">Submit</button>
+    </form>
+{% endblock %}

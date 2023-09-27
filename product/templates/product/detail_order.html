@@ -1,0 +1,70 @@
+{% load static %}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'product/css/cart.css' %}">
+</head>
+{% include 'product/messages.html' %}
+<div class="container-fluid row">
+    <div class="col-lg-12">
+        <div class="box-element">
+            <a href="/" class="btn btn-outline-dark">&#x2190 Continue Shopping</a>
+            <br><br>
+        </div>
+        <br>
+        <div class="box-element">
+
+            <div class="cart-row">
+                {#                    <div style="flex: 1;"><strong>Order</strong></div>#}
+                <div style="flex: 2;"><strong>Image</strong></div>
+                <div style="flex: 2;"><strong>Item</strong></div>
+                <div style="flex: 1;"><strong>Unit Price</strong></div>
+                <div style="flex: 1;"><strong>Quantity</strong></div>
+                <div style="flex: 1;"><strong>Category</strong></div>
+                <div style="flex: 1;"><strong>Brand</strong></div>
+                <div style="flex: 1;"><strong>Status</strong></div>
+                <div style="flex: 1;"><strong>Amount</strong></div>
+                {% for i in all_orders %}
+                    {% if i.status == "Delivered" %}
+                        <div style="flex: 1;"><strong>Return</strong></div>
+                    {% endif %}
+                    {% if i.status == "Delivered" and i.want_return == True %}
+                        <div style="flex: 1;"><strong>Picked</strong></div>
+                        <div style="flex: 1;"><strong>Returned</strong></div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+            {% for item in all_orders %}
+
+                <div class="cart-row">
+                    {#                        <div style="flex: 1;"><a href="{% url 'detail-orders' item.id %}">{{ item.id }}</a></div>#}
+                    <div style="flex: 2;"><img class="row-image" src="{{ item.product.image.url }}" alt=""></div>
+                    <div style="flex: 2;">{{ item.product.name }}</div>
+                    <div style="flex: 1;">(₹{{ item.product.calculate_discount }})</div>
+                    <div style="flex: 1;">{{ item.quantity }}</div>
+                    <div style="flex: 1;">{{ item.product.category }}</div>
+                    <div style="flex: 1;">{{ item.product.brand }}</div>
+                    <div style="flex: 1;">{{ item.status }}</div>
+                    <div style="flex: 1;">{{ item.total_price }}</div>
+
+{#                    <div style="flex: 1;">{{ item.total_price }}</div>#}
+                    {% if item.status == "Delivered" %}
+                        <div style="flex: 1;"><a href="{% url 'return-product' item.id   %}">Return</a></div>
+                    {% endif %}
+                    {% if item.status == "Delivered" and item.want_return == True %}
+                        <div style="flex: 1;">{{ item.is_picked }}</div>
+                        <div style="flex: 1;">{{ item.is_returned }}</div>
+                    {% endif %}
+                </div>
+
+            {% endfor %}
+            <div class="row">
+                <p>
+                    <span>Payment Method : {{ order.payment_method }}</span>
+                    <br>
+                    <span>Total Amount : {{ order.total_amount }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
